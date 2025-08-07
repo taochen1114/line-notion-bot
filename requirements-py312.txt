@@ -1,0 +1,35 @@
+# Python 3.12 相容版本的依賴清單
+# 使用更新的套件版本來解決編譯問題
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Line Bot SDK - 使用更新版本
+line-bot-sdk==3.12.0
+
+# Notion API
+notion-client==2.2.1
+
+# HTTP Client
+httpx==0.25.2
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Google Cloud
+google-cloud-logging==3.8.0
+google-cloud-secret-manager==2.16.4
+
+# Data Validation
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+
+# Development
+black==23.11.0
+flake8==6.1.0

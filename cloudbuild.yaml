@@ -1,0 +1,51 @@
+# Google Cloud Build 配置檔案
+steps:
+  # 建置 Docker 映像
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 'gcr.io/$PROJECT_ID/line-notion-bot:$COMMIT_SHA',
+      '-t', 'gcr.io/$PROJECT_ID/line-notion-bot:latest',
+      '.'
+    ]
+
+  # 推送映像到 Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/line-notion-bot:$COMMIT_SHA']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/line-notion-bot:latest']
+
+  # 部署到 Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args: [
+      'run', 'deploy', 'line-notion-bot',
+      '--image', 'gcr.io/$PROJECT_ID/line-notion-bot:$COMMIT_SHA',
+      '--region', 'asia-east1',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--memory', '512Mi',
+      '--cpu', '1',
+      '--concurrency', '80',
+      '--max-instances', '10',
+      '--set-env-vars', 'ENVIRONMENT=production',
+      '--set-secrets', 'LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest',
+      '--set-secrets', 'LINE_CHANNEL_SECRET=line-channel-secret:latest',
+      '--set-secrets', 'NOTION_API_TOKEN=notion-api-token:latest',
+      '--set-secrets', 'NOTION_DATABASE_ID=notion-database-id:latest',
+      '--set-env-vars', 'GCP_PROJECT_ID=$PROJECT_ID'
+    ]
+
+# 建置選項
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# 建置超時時間
+timeout: '1200s'
+
+# 標籤
+tags:
+  - 'line-notion-bot'
+  - 'cloud-run'
